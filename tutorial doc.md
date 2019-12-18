@@ -343,3 +343,147 @@ module.exports = merge(common, {
 }
 
 ```
+
+## Html-loader,File-loader and clean-webpack-plugin
+
+[watch Here](https://youtu.be/MpGLUVbqoYQ?t=4637)
+
+[Html-loader](https://github.com/webpack-contrib/html-loader)
+
+Ok, So far so good but images are still not working. say if you have any type of images in your html, how will u handle them properly ? in you dev env it may under assets folder and may use something like this `<img src="./assets/img/abc.png" />` but that may not work in in your production as in your `dist` folder there may not be `assets` folder at all.
+
+or may be you want to compress your images or do something else like resolving their path correctly in different env etc.
+
+To handle those things you need `Html-loader`
+
+actually whats `html-loader` will do is, it will take your images and it will write in commonJs in your webpack bundle file `main.js` as you saw in case of `css-loader`.
+
+same as u did in case of `css`, you are doing here as well. Now you need another loader which take those commonJs stuff for your images and make it real image, which browser understands and more importantly, which u actually intended to do with. To tackle that you need another loader `file-loader`
+
+Now a the last we need to keep our `dist` folder clutter free for that purpose we need another `plugin` called `clean-webpack` plugin.
+
+now starts one by one
+
+1.  install `html-loader` and `file-loader` like `npm install html-loader -D`
+2.  now go to `webpack.common.js` amd add this loader like below
+
+```
+
+        var HtmlWebpackPlugin = require("html-webpack-plugin");
+
+        module.exports = {
+            entry: "./src/index.js",
+            plugins: [
+            new HtmlWebpackPlugin({
+            template: "./src/template.html"})
+            ],
+        module: {
+            rules: [
+            {
+                test: /\.scss$/,
+                use: [
+                "style-loader", //3. Inject styles into DOM
+                "css-loader", //2. Turns css into commonjs
+                "sass-loader" //1. Turns sass into css
+                ]
+            },
+            {
+                test:/\.html$/,
+                use:["html-loader"]
+            }
+            ]
+        }
+        };
+
+```
+
+3.  install File loader to handle the images `npm instal file-loader -D` and change your `webpack.common.js`
+
+```
+
+       var HtmlWebpackPlugin = require("html-webpack-plugin");
+
+
+       module.exports = {
+           entry: "./src/index.js",
+           plugins: [
+           new HtmlWebpackPlugin({
+           template: "./src/template.html"})
+           ],
+       module: {
+           rules: [
+           {
+               test: /\.scss$/,
+               use: [
+               "style-loader", //3. Inject styles into DOM
+               "css-loader", //2. Turns css into commonjs
+               "sass-loader" //1. Turns sass into css
+               ]
+           },
+           {
+               test:/\.html$/,
+               use:["html-loader"]
+           },
+           {
+               test:/\.(png|jpg|svg|gif|jpeg)$/,
+               use:{
+                   loader:"file-loader",
+                   options:{
+                       name:"[name].[hash].[ext]",
+                       outputPath:"imgs"
+                   }
+               }
+           }
+           ]
+       }
+       };
+
+```
+
+Now to delete the clutter from the dist folder, you need to install `clean-webpack-plugin` like this
+
+1. `npm install clean-webpack-plugin`
+2. change your `webpack.common.js` like below
+
+```
+
+       var HtmlWebpackPlugin = require("html-webpack-plugin");
+       var CleanWebpackPlugin =require("clean-webpack-plugin");
+
+
+       module.exports = {
+           entry: "./src/index.js",
+           plugins: [
+           new HtmlWebpackPlugin({
+           template: "./src/template.html"}),
+           new CleanWebpackPlugin()
+           ],
+       module: {
+           rules: [
+           {
+               test: /\.scss$/,
+               use: [
+               "style-loader", //3. Inject styles into DOM
+               "css-loader", //2. Turns css into commonjs
+               "sass-loader" //1. Turns sass into css
+               ]
+           },
+           {
+               test:/\.html$/,
+               use:["html-loader"]
+           },
+           {
+               test:/\.(png|jpg|svg|gif|jpeg)$/,
+               use:{
+                   loader:"file-loader",
+                   options:{
+                       name:"[name].[hash].[ext]",
+                       outputPath:"imgs"
+                   }
+               }
+           }
+           ]
+       }
+       };
+
+```
