@@ -16,8 +16,18 @@ devtool: "none"
 ```
 
 ## Bare minimum file structure of a webpack config `weback.config.js`
-```module.export={
+```
+const path=require("path");
+module.export={
+mode:"development",
+entry:"./src/app.js",
+output:{
+filename:"main.js",
+path:path.resolve(__dirname,'dist')
+}
 
 }```
+
+This is the bare minimum you should be having by the way
 
 
