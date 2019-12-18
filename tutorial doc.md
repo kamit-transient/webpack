@@ -10,7 +10,7 @@
 
 By default webpack use `eval(....)` everhwere in their produced bundle file,
 Image before setting `devtool:"none"`
-![](./assets/img/"before devtool none".png)
+![](./assets/img/beforedevtoolnone.png)
 which you can turn off by setting
 
 ```
