@@ -135,3 +135,47 @@ Same you can do for sass/scss file as well, you need to have a `sass-loader` and
        }
    }
 ```
+
+## cache busting and Plugins
+
+Browsers caches statuc resources like css, js and images etc. this can be problematic and browser may not download the asked resources from server but rather server from the disk cache.
+
+To test it, press `CTRL+ R` in your in network tab of your browser(chrome) it will download your css(say).
+
+Then try to do do normal referesh, as you do in browser, you see something like this
+![](./assets/img/hardreferesh.png)
+
+now do a normal referesh and you will see that file is serverd from hard disk cache instead
+
+![](./assets/img/regularreferesh.png) see the Size tab in both the images.
+
+To prevent this probblem, webpack use cocenpt of `content based hash` . In this it add the has of the content to the file name of produced assests/chunks.
+
+you can do like this `main.[contentHash].js`
+
+```
+const path=require("path");
+module.export={
+mode:"development",
+entry:"./src/app.js",
+output:{
+filename:"main.[contentHash].js",
+path:path.resolve(__dirname,'dist')
+}
+
+}
+```
+
+but now you will have problem because of dynamic file name,whenever you change the content of your file, it will create new hash `main.<somehash>.js`, so can not directly include that in your `index.html` like this.
+
+earlier `index.html` without `contentHash`
+
+![](./assets/img/staticindexhtml.png)
+
+To handle this problem, now u are not going to include that `main.js` by your self in your `index.html` file. rather you will let the webpack plugin do that for you.
+so now you are finally at plugin
+
+## webpack plugins
+
+webpack plugins understands JS, and it actually customises Webpack build process by various ways. For example adding this script in your `index.html` for you, instead of you doing this by your self.
+There are tons of plugins available at [Webpack plugins , click here](https://webpack.js.org/plugins/)
