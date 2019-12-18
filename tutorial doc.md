@@ -233,3 +233,113 @@ module.exports = {
 ```
 
 3. run your webpack and you are done, now are successfully including your webpack bundle file and also you are providing your own html code as well.
+
+## Splitting code for development and production
+
+you can watch the video here at [watch here](https://youtu.be/MpGLUVbqoYQ?t=4041)
+
+So far you had only one webpack config file `webpack.config.js` but now you are going to separate your config for production and development environment.
+
+remember you can these files any thing you like:
+
+1. create three file in root of your project `webpack.development.js`, `webpack.production.js` and a common file which has all the common config in both the environment `webpack.common.js` you could have named these file `apple.js`, `banana.js` and `mango.js` respectively if you wanted to,
+
+2. now `webpack.common.js` will be something like below:
+
+```
+
+var HtmlWebpackPlugin = require("html-webpack-plugin");
+
+module.exports = {
+    entry: "./src/index.js",
+    plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/template.html"})
+    ],
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          "style-loader", //3. Inject styles into DOM
+          "css-loader", //2. Turns css into commonjs
+          "sass-loader" //1. Turns sass into css
+        ]
+      }
+    ]
+  }
+};
+
+```
+
+3. now `webpack.development.js` will be something like below:
+
+```
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "development",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist")
+  }
+});
+
+```
+
+4. make your `webpack.production.js` like below
+
+```
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "main.[contentHash].js",
+    path: path.resolve(__dirname, "dist")
+  }
+});
+
+```
+
+5. Now you need to merge these config together, to do so install `npm install webpack-merge -D`
+
+6. you are also going to use `webpack-dev-server` in your development env so `npm install webpack-dev-server -D`
+
+7. Finally your `package.json` should look like this
+
+```
+//package.json
+
+{
+  "name": "code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+          "start": "webpack-dev-server  --config webpack.dev.js --open",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bootstrap": "^4.3.1",
+    "css-loader": "^2.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-merge": "^4.2.1"
+  }
+}
+
+```
