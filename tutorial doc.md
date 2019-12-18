@@ -177,5 +177,59 @@ so now you are finally at plugin
 
 ## webpack plugins
 
-webpack plugins understands JS, and it actually customises Webpack build process by various ways. For example adding this script in your `index.html` for you, instead of you doing this by your self.
+webpack plugins understands JS, and it actually customizes Webpack build process by various ways. For example adding this script in your `index.html` for you, instead of you doing this by your self.
 There are tons of plugins available at [Webpack plugins , click here](https://webpack.js.org/plugins/)
+
+> Bur for our purpose here, HtmlWebpackPlugin will do the job
+
+so lets install this plugin and use it.
+
+1. Install HtmlWebpackPlugin like `npm install --save-dev html-webpack-plugin`
+2. require this in `webpack.config.js` like this
+
+```
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var path = require('path');
+
+module.exports = {
+  entry: 'index.js',
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'main.[contentHash].js'
+  },
+  plugins: [new HtmlWebpackPlugin()]
+};
+```
+
+3. finally run your webpack.
+
+But sometime you need to provide your own html for template for some reasons like if you are using some sort of Framework like Bootstrap, Bulma etc. in that you can provide that html template and `HtmlWebpackPlugin` will include that code as part of the html it generates . To do that you need to modify the plugins a bit. so
+
+1. create your html template like `template.html`, you can name it anything
+
+```
+src/template.html
+//.....
+//....
+
+```
+
+2.
+
+```
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+var path = require('path');
+
+module.exports = {
+  entry: 'index.js',
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'main.[contentHash].js'
+  },
+  plugins: [new HtmlWebpackPlugin({
+      template:"./src/template.html"
+  })]
+};
+```
+
+3. run your webpack and you are done, now are successfully including your webpack bundle file and also you are providing your own html code as well.
