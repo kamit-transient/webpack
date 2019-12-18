@@ -487,3 +487,93 @@ Now to delete the clutter from the dist folder, you need to install `clean-webpa
        };
 
 ```
+
+## Multiple entry points
+
+So far you had only one entry point and was `main.[contentHash].js` but you need to seperate the entry points say one for your own js and other vendor specific JS where you put your Framework specif things. to do so you need to change you `webpack config files` a bit like below
+
+1. now `webpack.common.js` will be something like below:
+
+```
+
+       var HtmlWebpackPlugin = require("html-webpack-plugin");
+       var CleanWebpackPlugin =require("clean-webpack-plugin");
+
+
+       module.exports = {
+           entry: {
+            main:"./src/index.js",
+           vendor: "./src/vendor.js"
+           },
+           plugins: [
+           new HtmlWebpackPlugin({
+           template: "./src/template.html"}),
+           new CleanWebpackPlugin()
+           ],
+       module: {
+           rules: [
+           {
+               test: /\.scss$/,
+               use: [
+               "style-loader", //3. Inject styles into DOM
+               "css-loader", //2. Turns css into commonjs
+               "sass-loader" //1. Turns sass into css
+               ]
+           },
+           {
+               test:/\.html$/,
+               use:["html-loader"]
+           },
+           {
+               test:/\.(png|jpg|svg|gif|jpeg)$/,
+               use:{
+                   loader:"file-loader",
+                   options:{
+                       name:"[name].[hash].[ext]",
+                       outputPath:"imgs"
+                   }
+               }
+           }
+           ]
+       }
+       };
+
+```
+
+2.  you need to update your output paths as well in your `webpack.development.js` and `webpack.production.js`
+
+now `webpack.development.js` will be something like below:
+
+```
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "development",
+  output: {
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist")
+  }
+});
+
+```
+
+make your `webpack.production.js` like below
+
+```
+const path = require("path");
+const common = require("./webpack.common");
+const merge = require("webpack-merge");
+
+module.exports = merge(common, {
+  mode: "production",
+  output: {
+    filename: "[name].[contentHash].js",
+    path: path.resolve(__dirname, "dist")
+  }
+});
+
+```
+
+3.  Now tun your webpack
