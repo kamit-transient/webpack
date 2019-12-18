@@ -577,3 +577,7 @@ module.exports = merge(common, {
 ```
 
 3.  Now tun your webpack
+
+## Minification
+
+[watch ](https://youtu.be/MpGLUVbqoYQ?t=5687)
